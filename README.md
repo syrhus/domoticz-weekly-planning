@@ -7,12 +7,14 @@ It can be used for light/switch(ON/OFF), selector levels and SetPoints
 - a entire program can be deactivate without deleting all timers and reactivate later with the buttons **Deactivate All** and **Activate All**
 
 //////////////////////////////////////////////////////////////
+
 To install:
 
 Go in your Domoticz directory and run the command line:
 git clone https://github.com/syrhus/domoticz-weekly-planning.git
 
 /////////////////////////////////////////////////////////////
+
 Manual installation:
 Add files:
    - **planning.js** file to the **domoticz/www/app/timers** folder 
