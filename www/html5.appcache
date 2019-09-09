@@ -1,0 +1,20 @@
+CACHE MANIFEST
+
+# ref 1 //#BuildHash //forces a cache refresh on every new build
+
+CACHE:
+# Images
+images/iphone-icon.png
+favicon.ico
+
+# HTML pages
+views/offline.html
+
+# Resources that require the user to be online.
+NETWORK:
+*
+
+# Fallback content
+FALLBACK:
+images images/iphone-icon.png
+/ views/offline.html
