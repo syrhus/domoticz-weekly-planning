@@ -10,16 +10,16 @@ It can be used for light/switch(ON/OFF), selector levels and SetPoints
 
 To download files on domoticz  folder, first move with a command line to the domoticz folder: 
 
-wget -P www/app/timers/ https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/app/timers/DeviceTimersController.js 
+wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/app/timers/DeviceTimersController.js  -O www/app/timers/DeviceTimersController.js
 
-wget -P www/app/timers/ https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/app/timers/planning.js 
+wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/app/timers/planning.js  -O www/app/timers/planning.js
 
-wget -P www/app/css/ https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/css/planning.css 
+wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/css/planning.css -O www/css/planning.css
 
 
 NOTE: optional, I created a "empty" html5.appcache file as it is absolutely useless = no Offline mode.
 you can forget it 
-wget -P www/ https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/html5.appcache
+wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/html5.appcache -O www/html5.appcache
 
 
 /////////////////////////////////////////////////////////////
