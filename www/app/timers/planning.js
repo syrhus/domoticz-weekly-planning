@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////
 // Weekly Planning ,  2017, Syrhus
-// v1.3.2
+// v1.4.0
 // updated for v4.9700
 // 2018-09-20 : add  Odd & Even week numbers
 // 2018-10-30 : bug on <th> fixed
@@ -13,6 +13,7 @@
 //		listen timers event [timersInitialized] & [timersLoaded]
 //              improve speed performance
 //		adujst to the right mode if less than 4 modes used and not "heatest"
+// 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
@@ -46,6 +47,7 @@ PlanningTimerSheet = function(options){
 	var $tbody = null;
 	var $thead = null;
 
+	var prevTimers = [];
 	var planning = [];
 
 	//////////////////////////////
@@ -341,9 +343,12 @@ PlanningTimerSheet = function(options){
 		createPlanning(isOddEven);
 
 		var values = [];
+		prevTimers = [];
 		$.each(SetPoints, function (ndx) {
 			//if (this.Active && (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD)) {
 			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD) {
+				prevTimers.push(this.idx);
+
 				var trigger = {};
 				var day = 1;
 
@@ -460,52 +465,70 @@ PlanningTimerSheet = function(options){
 		var setPoints = convertTriggersToSetPoints(plan);
     var activeForced = (arguments.length === 1 ? true: false);
 
-		$.ajax({
-			url: "json.htm?type=command&param=" + defaults.commandClear + "&idx=" + defaults.devid,
-			dataType: 'json',
-			error: function () {
-				HideNotify();
-				ShowNotify($.t('Problem deleting timer!'), 2500, true);
-			},
-			success: function(){
-				$.each(setPoints, function(ndx, tsettings){
-					if(tsettings.Days === SUM_EVERYDAYS)
-						tsettings.Days = EVERYDAYS;
-					else if(tsettings.Days === SUM_WEEKDAYS)
-						tsettings.Days = WEEKDAYS;
-					else if(tsettings.Days === SUM_WEEKENDS)
-						tsettings.Days = WEEKENDS;
+		var timers= [];
+		$.each(setPoints, function(ndx, tsettings){
+			if(tsettings.Days === SUM_EVERYDAYS)
+				tsettings.Days = EVERYDAYS;
+			else if(tsettings.Days === SUM_WEEKDAYS)
+				tsettings.Days = WEEKDAYS;
+			else if(tsettings.Days === SUM_WEEKENDS)
+				tsettings.Days = WEEKENDS;
 
-					var urlcmd =  "json.htm?type=command&param=" + defaults.commandAdd +"&idx=" + defaults.devid +
-						"&active=" + (activeForced ? active : tsettings.Active) +
-						"&timertype=" + tsettings.Type +
-						"&date=" + tsettings.Date +
-						"&hour=" + tsettings.Hour +
-						"&min=" + tsettings.Min +
-						"&" + defaults.propValueAjax +"=" + tsettings[defaults.propValue] +
-						"&days=" + tsettings.Days +
-						"&mday=" + tsettings.MDay +
-						"&month=" + tsettings.Month +
-						"&occurence=" + tsettings.Occurence +
-						"&randomness=false";
+			var urlcmd =  "json.htm?type=command&param=" + defaults.commandAdd +"&idx=" + defaults.devid +
+				"&active=" + (activeForced ? active : tsettings.Active) +
+				"&timertype=" + tsettings.Type +
+				"&date=" + tsettings.Date +
+				"&hour=" + tsettings.Hour +
+				"&min=" + tsettings.Min +
+				"&" + defaults.propValueAjax +"=" + tsettings[defaults.propValue] +
+				"&days=" + tsettings.Days +
+				"&mday=" + tsettings.MDay +
+				"&month=" + tsettings.Month +
+				"&occurence=" + tsettings.Occurence +
+				"&randomness=false";
 
-					if(!defaults.temperatureModes && defaults.propValueAjax !== "command")
-						urlcmd += "&command=0";
+			if(!defaults.temperatureModes && defaults.propValueAjax !== "command")
+				urlcmd += "&command=0";
 
-					$.ajax({
-						url: urlcmd,
-						async: false,
-						dataType: 'json',
-						error: function () {
-							HideNotify();
-							ShowNotify($.t('Problem clearing timers!'), 2500, true);
-						}
-					});
-				});
-
-				defaults.refreshCallback();
-			}
+			timers.push(urlcmd);
 		});
+
+		clearPrevSetPoints(addSetPointTimers, timers);
+
+	};
+
+	clearPrevSetPoints = function(callbackFunc, param){
+		var timers = [];
+		$.each(prevTimers, function(ndx, timerid){
+			timers.push("json.htm?type=command&param=deletetimer&idx=" + timerid);
+		});
+
+		runAjaxLoop(timers,'Problem deleting timer!',0, callbackFunc, param );
+	};
+
+	addSetPointTimers = function(param){
+		runAjaxLoop(param,'Problem adding timer!',0, defaults.refreshCallback);
+	};
+
+	runAjaxLoop = function(loopParams, errorMsg, curIndex, callbackFunc, param){
+		if(loopParams.length > 0)
+			$.ajax({
+				url: loopParams[curIndex],
+				dataType: 'json',
+				error: function () {
+					HideNotify();
+					ShowNotify($.t(errorMsg), 2500, true);
+				},
+				complete: function(){
+					curIndex++;
+					if(curIndex < loopParams.length)
+						runAjaxLoop(loopParams, errorMsg, curIndex, callbackFunc, param);
+					else if(callbackFunc)
+						callbackFunc(param);
+				}
+			});
+		else if(callbackFunc)
+			callbackFunc(param);
 	};
 
 	getValueFromClass = function (cls) {
