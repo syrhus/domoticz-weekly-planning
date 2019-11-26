@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////
 // Weekly Planning ,  2017, Syrhus
-// v1.4.0
+// v1.4.1
 // updated for v4.9700
 // 2018-09-20 : add  Odd & Even week numbers
 // 2018-10-30 : bug on <th> fixed
@@ -14,6 +14,7 @@
 //              improve speed performance
 //		adujst to the right mode if less than 4 modes used and not "heatest"
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
+// 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
