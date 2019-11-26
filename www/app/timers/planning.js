@@ -500,7 +500,7 @@ PlanningTimerSheet = function(options){
 	clearPrevSetPoints = function(callbackFunc, param){
 		var timers = [];
 		$.each(prevTimers, function(ndx, timerid){
-			timers.push("json.htm?type=command&param=deletetimer&idx=" + timerid);
+			timers.push("json.htm?type=command&param=delete"+ (defaults.temperatureModes ? "setpoint" : "") + "timer&idx=" + timerid);
 		});
 
 		runAjaxLoop(timers,'Problem deleting timer!',0, callbackFunc, param );
