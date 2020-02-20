@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////
 // Weekly Planning ,  2017, Syrhus
-// v1.4.1
+// v1.4.2
 // updated for v4.9700
 // 2018-09-20 : add  Odd & Even week numbers
 // 2018-10-30 : bug on <th> fixed
@@ -15,6 +15,7 @@
 //		adujst to the right mode if less than 4 modes used and not "heatest"
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 // 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
+// 2020-02-20 : fix ConvertSetPointToTimers if any other type of timers
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
@@ -314,20 +315,22 @@ PlanningTimerSheet = function(options){
 		var nbTicks = 2;
 		var bReload = false;
 		$.each(SetPoints, function (ndx) {
-			var time = parseInt(this.Time.substr(3, 2));
-			if(time === 10 || time === 20 || time === 40 || time === 50)
-				nbTicks = 6;
-			else if(nbTicks <4 && time === 15 || time === 45)
-				nbTicks = 4;
-			else if(nbTicks < 2 && time === 30)
-				nbTicks = 2;
+			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD) {
+				var time = parseInt(this.Time.substr(3, 2));
+				if(time === 10 || time === 20 || time === 40 || time === 50)
+					nbTicks = 6;
+				else if(nbTicks <4 && time === 15 || time === 45)
+					nbTicks = 4;
+				else if(nbTicks < 2 && time === 30)
+					nbTicks = 2;
 
-			if (this.Type === EVEN || this.Type === ODD) {
-				isOddEven = true;
+				if (this.Type === EVEN || this.Type === ODD) {
+					isOddEven = true;
+				}
+
+				if(isOddEven && nbTicks === 6)
+					return false;
 			}
-
-			if(isOddEven && nbTicks === 6)
-				return false;
 		});
 
 		if(defaults.nbTicksPerHour < nbTicks){
@@ -346,7 +349,6 @@ PlanningTimerSheet = function(options){
 		var values = [];
 		prevTimers = [];
 		$.each(SetPoints, function (ndx) {
-			//if (this.Active && (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD)) {
 			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD) {
 				prevTimers.push(this.idx);
 
