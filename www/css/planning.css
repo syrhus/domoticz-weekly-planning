@@ -1,4 +1,14 @@
 /************  timesheet **************/
+.ts-planning .ts-wrapper{
+width:100%;
+height:auto;
+}
+
+.ts-planning .ts-wrapper.zoom, .ts-planning .ts-wrapper.zoom2{
+overflow-x:scroll;
+overflow-y:hidden;
+}
+
 .ts-planning table{
     table-layout: fixed;
     border-collapse: collapse;
@@ -10,6 +20,13 @@
     user-select: none;
     -o-user-select: none;
 	width:100%;
+}
+
+.ts-planning .zoom table{
+	width:400%;
+}
+.ts-planning .zoom2 table{
+	width:600%;
 }
 
 .ts-planning tr {
