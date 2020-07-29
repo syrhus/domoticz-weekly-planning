@@ -15,7 +15,7 @@
 //		adujst to the right mode if less than 4 modes used and not "heatest"
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 // 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
-// 2020-02-20 : fix ConvertSetPointToTimers if any other type of timers
+// 2020-07-29 : add 5mins and 2mins Time range
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
@@ -160,10 +160,12 @@ PlanningTimerSheet = function(options){
 			$found = $tbody.find("td[h=" + index + "]");
 			if(m){
 				if(colspan > 1){
-					if (m === "0" )
-						$found = $found.filter("td[m='0'],td[m='15'],td[m='10'],td[m='20']");
-					else
-						$found = $found.filter("td[m='30'],td[m='45'],td[m='40'],td[m='50']");
+					var filters = [];
+					var offset = (m === "00" ) ? 0 :30;
+					for(var i =0; i < colspan; i++){
+						filters.push("td[m='" + pad2(offset + (30/colspan)*i) +"']");
+					}
+					$found = $found.filter(filters.join(','));
 				} else if (colspan === 1) {
 					$found = $found.filter("td[m='" + m +"']");
 				}
@@ -185,7 +187,8 @@ PlanningTimerSheet = function(options){
 		return (_mode != null ? _mode.class : null);
 	};
 
-	getSlice2 = function(val){  return ("0" + val).slice(-2); }
+	getSlice2 = function(val){  return ("0" + val).slice(-2); };
+	pad2 = function(num) { var size=2; var s = num+"";    while (s.length < size) s = "0" + s;    return s;};
 
 	createPlanning = function (isOddEven) {
 		planning = [];
@@ -247,18 +250,7 @@ PlanningTimerSheet = function(options){
 			if(nbticks === 1)
 				return obj.hour;
 			else {
-				var divider = 15;
-				switch (nbticks) {
-					case 2:
-						divider = 30;
-						break;
-					case 6:
-						divider = 10;
-						break;
-					case 4:
-					default:
-						divider = 15;
-				}
+				var divider = 60/nbticks;
 				return obj.hour *nbticks + (obj.min/divider);
 			}
 	};
@@ -313,35 +305,26 @@ PlanningTimerSheet = function(options){
 		//check if you have to display odd&even week
 		var isOddEven = false;
 		var nbTicks = 2;
-		var bReload = false;
+//		var bReload = false;
 		$.each(SetPoints, function (ndx) {
-			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD) {
-				var time = parseInt(this.Time.substr(3, 2));
-				if(time === 10 || time === 20 || time === 40 || time === 50)
-					nbTicks = 6;
-				else if(nbTicks <4 && time === 15 || time === 45)
-					nbTicks = 4;
-				else if(nbTicks < 2 && time === 30)
-					nbTicks = 2;
-
-				if (this.Type === EVEN || this.Type === ODD) {
+			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD){
+				if (this.Type === EVEN || this.Type === ODD){
 					isOddEven = true;
+					return false;
 				}
 
-				if(isOddEven && nbTicks === 6)
-					return false;
 			}
 		});
 
-		if(defaults.nbTicksPerHour < nbTicks){
+		/*if(defaults.nbTicksPerHour < nbTicks){
 			defaults.nbTicksPerHour = nbTicks;
 			bReload = true;
-		}
+		}*/
 
 		$element.find('#oew_oddeven').attr('checked', isOddEven);
 		if(defaults.odd_even_week !== isOddEven){
 			defaults.odd_even_week =isOddEven;
-			bReload = true;
+			//bReload = true;
 		}
 
 		createPlanning(isOddEven);
@@ -349,6 +332,7 @@ PlanningTimerSheet = function(options){
 		var values = [];
 		prevTimers = [];
 		$.each(SetPoints, function (ndx) {
+			//if (this.Active && (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD)) {
 			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD) {
 				prevTimers.push(this.idx);
 
@@ -460,7 +444,27 @@ PlanningTimerSheet = function(options){
 				if (a.hour === b.hour) return 0;
 				else return (a.hour < b.hour) ? -1 : 1;
 			});
-		})
+			
+			$.each(day.triggers, function (ndx, trigger) {
+				if(trigger.min === 0)
+					return;
+				if( trigger.min % 30 === 0)
+					nbTicks = (nbTicks < 2) ? 2 : nbTicks;
+				else if(trigger.min % 15 === 0 )
+					nbTicks = (nbTicks < 4) ? 4 : nbTicks;
+				else if(trigger.min % 10 === 0 )
+					nbTicks = (nbTicks < 6) ? 6 : nbTicks;
+				else if(trigger.min % 5 === 0 )
+					nbTicks = (nbTicks < 12) ? 12 : nbTicks;
+				else if(trigger.min % 2 === 0 )
+					nbTicks = (nbTicks < 30) ? 30 : nbTicks;					
+			});
+		});
+		
+		if(defaults.nbTicksPerHour < nbTicks){
+			defaults.nbTicksPerHour = nbTicks;
+		}
+
 	};
 
 	updateSetPoints = function(active){
@@ -586,16 +590,7 @@ PlanningTimerSheet = function(options){
 
 	getColSpan = function(level){
 		if(level === 0)		{
-			switch (defaults.nbTicksPerHour) {
-				case 1:
-					return 1;
-				case 2:
-					return 2;
-				case 6:
-					return 6;
-				default:
-					return 4;
-			}
+			return defaults.nbTicksPerHour || 4;
 		}
 		else if (level === 1){
 			switch (defaults.nbTicksPerHour) {
@@ -603,6 +598,10 @@ PlanningTimerSheet = function(options){
 					return 1;
 				case 6:
 					return 3;
+				case 12:
+					return 6;
+				case 30:
+					return 15;
 				default:
 					return 2;
 			}
@@ -622,42 +621,33 @@ PlanningTimerSheet = function(options){
 		}
 		headers.push("</tr>");
 
-		var mins =["0"];
-		var mins_desc_fin = ["59"];
 		if(defaults.nbTicksPerHour >=2){
 			headers.push("<tr>");
-			mins = ["0","30"];
-			mins_desc_fin = ["29","59"];
+			var ticks = 2;
 			for (var h = 0 ; h < 24; h++) {
-				for (var m = 0; m < mins.length; m++) {
-					headers.push("<th h=" + h + " m=" + mins[m] + " title='" + h + ":" + getSlice2(mins[m]) + " - " + h + ":" + mins_desc_fin[m] + "' colspan=" + getColSpan(1) +"></th>");
+				for (var m = 0; m < ticks; m++) {
+					headers.push("<th h=" + h + " m=" + pad2((m*60)/ticks) + " title='" + h + ":" + pad2((m*60)/ticks) + " - " + h + ":" + pad2((((m+1)*60/ticks)-1)) + "' colspan=" + getColSpan(1) +"></th>");
 				}
 			}
 			headers.push("</tr>");
 
 			if(defaults.nbTicksPerHour >=4){
 				headers.push("<tr>");
-				if(defaults.nbTicksPerHour === 4 ){
-					mins = ["0","15","30","45"];
-					mins_desc_fin = ["14","29","44","59"];
-			  }
-				else if (defaults.nbTicksPerHour === 6) {
-					mins = ["0","10","20","30","40","50"];
-					mins_desc_fin = ["09","19","29","39","49","59"];
-				}
+				ticks = defaults.nbTicksPerHour;
 				for (var h = 0 ; h < 24; h++) {
-					for (var m = 0; m < mins.length; m++) {
-						headers.push("<th h=" + h + " m=" + mins[m] + " title='" + h + ":" + getSlice2(mins[m]) + " - " + h + ":" + mins_desc_fin[m] + "' ></th>");
+					for (var m = 0; m < ticks; m++) {
+						headers.push("<th h=" + h + " m=" + pad2((m*60)/ticks) + " title='" + h + ":" + pad2((m*60)/ticks) + " - " + h + ":" + pad2((((m+1)*60/ticks)-1)) + "'></th>");
 					}
-				}
+				}				
+				
 				headers.push("</tr>");
 			}
 		}
 
 		var tds = [];
-		createBodyRows(tds, mins, mins_desc_fin,0);
+		createBodyRows(tds, 0);
 		if(defaults.odd_even_week)
-			createBodyRows(tds, mins, mins_desc_fin,7);
+			createBodyRows(tds, 7);
 
 		if(defaults.odd_even_week)
 			$table.addClass('odd-even');
@@ -668,7 +658,7 @@ PlanningTimerSheet = function(options){
 		$tbody.empty().append(tds.join(''));
 	};
 
-	createBodyRows = function (tds,mins, mins_desc_fin, delta) {
+	createBodyRows = function (tds, delta) {
 
 		for (var d = 0; d < days.length; d++) {
 			if(d === 0 &&  defaults.odd_even_week)
@@ -676,11 +666,13 @@ PlanningTimerSheet = function(options){
 			else
 					tds.push("<tr index=" + (d + 1 + delta) + "><th>" + $.t(days[d].name) + "</th>");
 
-			for (var h = 0; h < 24; h++) {
-				for (var m = 0; m < mins.length; m++) {
-					tds.push("<td h=" + h + " m=" + mins[m] + " title='"+ $.t(days[d].name) +" " + h + ":" + getSlice2(mins[m]) + " - " + h + ":" + mins_desc_fin[m] + "'></td>");
+			var ticks = defaults.nbTicksPerHour;
+			for (var h = 0 ; h < 24; h++) {
+				for (var m = 0; m < ticks; m++) {
+					tds.push("<td h=" + h + " m=" + pad2((m*60)/ticks) + " title='" + $.t(days[d].name) + " " + h + ":" + pad2((m*60)/ticks) + " - " + h + ":" + pad2((((m+1)*60/ticks)-1)) + "'></td>");
 				}
-			}
+			}				
+
 			tds.push("</tr>");
 		}
 
@@ -698,7 +690,7 @@ PlanningTimerSheet = function(options){
 			 		$table.off();
 		}
 
-		if(!(defaults.nbTicksPerHour === 1 || defaults.nbTicksPerHour === 2 || defaults.nbTicksPerHour ===4 || defaults.nbTicksPerHour ===6))
+		if(!(defaults.nbTicksPerHour === 1 || defaults.nbTicksPerHour === 2 || defaults.nbTicksPerHour ===4 || defaults.nbTicksPerHour ===6 || defaults.nbTicksPerHour ===12 || defaults.nbTicksPerHour ===30))
 				defaults.nbTicksPerHour === 2;
 
 		$element.empty().append('<div class="modes"></div>\
@@ -707,11 +699,15 @@ PlanningTimerSheet = function(options){
 							<option value="2">30 ' + $.t("mins") + '</option>\
 							<option value="4">15 ' + $.t("mins") + '</option>\
 							<option value="6">10 ' + $.t("mins") + '</option>\
+							<option value="12">5 ' + $.t("mins") + '</option>\
+						    <option value="30">2 ' + $.t("mins") + '</option>\
 							</select></div>\
+							<div class="ts-wrapper">\
 							<table class="ts-table" >\
 								<thead></thead>\
 								<tbody></tbody>\
 							</table>\
+							</div>\
 							<div class="ts-actions">\
 								<div class="ts-clearTimeSheet" >'+ $.t('Clear') +'</div>\
 								<div class="ts-updateSetPoints" >'+ $.t('Update') +'</div>\
@@ -764,6 +760,7 @@ PlanningTimerSheet = function(options){
 
 		$element.find('.timeRange').change(function(){
 			defaults.nbTicksPerHour = parseInt($(this).val());
+			
 			initPlanningTable();
 			showPlanning();
 		});
@@ -794,6 +791,12 @@ PlanningTimerSheet = function(options){
 
 	initPlanningTable = function () {
 		createTable();
+			if(defaults.nbTicksPerHour >= 12){
+			   $element.find('.ts-wrapper').addClass((defaults.nbTicksPerHour === 12)?'zoom':'zoom2');
+
+			}else 
+				$element.find('.ts-wrapper').removeClass('zoom zoom2');
+
 		$element.find('.timeRange option[value="'+ defaults.nbTicksPerHour + '"]').prop('selected',true);
 
 		$element.show();
