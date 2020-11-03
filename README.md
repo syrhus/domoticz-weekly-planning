@@ -9,7 +9,7 @@ It can be used for light/switch(ON/OFF), selector levels and SetPoints
 
 ////////////////////////////////////////////////////////////
 
-##Automatic installation:
+## Automatic installation:
 To download files on domoticz  folder, first move with a command line to the domoticz folder: 
 
 wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/app/timers/DeviceTimersController.js  -O www/app/timers/DeviceTimersController.js
@@ -26,8 +26,7 @@ wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/ww
 
 /////////////////////////////////////////////////////////////
 
-##Manual installation:
-
+## Manual installation:
 Add files:
    - **planning.js** file to the **domoticz/www/app/timers** folder 
    - **planning.css** file to the **domoticz/www/css** folder
