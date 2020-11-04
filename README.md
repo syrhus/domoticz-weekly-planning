@@ -12,8 +12,9 @@ It can be used for **light/switch(ON/OFF)**, **selector levels** and **SetPoints
 In setpoint configuration, you can define your own temperatures values for the 4th buttons. You just have to click inside the button and enter your value from to greater to the lower
 
 #### Selector switch sample: Electric radiator
-![Electric heater](/images/electric_heater_timers.png)
 ![Timers](/images/selectorswitch_electric_heater.png)
+![Electric heater](/images/electric_heater_timers.png)
+
 
 #### Switch samples:
 ![Switch sample](/images/switch_15mins.png)
