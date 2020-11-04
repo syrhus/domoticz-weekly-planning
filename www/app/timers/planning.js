@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////
 // Weekly Planning ,  2017, Syrhus
-// v1.4.2
+// v1.5
 // updated for v4.9700
 // 2018-09-20 : add  Odd & Even week numbers
 // 2018-10-30 : bug on <th> fixed
@@ -16,6 +16,8 @@
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 // 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
 // 2020-07-29 : add 5mins and 2mins Time range
+// 2020-11-04 : add Tabs mode to view either this graphic view or the original data table -  requiered to update/change the /views/timers.html file
+//              available on this repository
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
