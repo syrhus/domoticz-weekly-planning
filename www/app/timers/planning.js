@@ -689,6 +689,8 @@ PlanningTimerSheet = function(options){
 			 if($table)
 			 		$table.off();
 		}
+		
+		$(defaults.container).find('#tabs').tabs() 
 
 		if(!(defaults.nbTicksPerHour === 1 || defaults.nbTicksPerHour === 2 || defaults.nbTicksPerHour ===4 || defaults.nbTicksPerHour ===6 || defaults.nbTicksPerHour ===12 || defaults.nbTicksPerHour ===30))
 				defaults.nbTicksPerHour === 2;
