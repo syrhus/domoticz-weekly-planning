@@ -7,15 +7,15 @@ It can be used for **light/switch(ON/OFF)**, **selector levels** and **SetPoints
 - a entire program can be deactivate without deleting all timers and reactivate later with the buttons **Deactivate All** and **Activate All**
 
 
-Setpoint sample:
+#### Setpoint sample:
 ![setpoint](/images/setpoint_tabs.png)
 In setpoint configuration, you can define your own temperatures values for the 4th buttons. You just have to click inside the button and enter your value from to greater to the lower
 
-Selector switch sample: Electric radiator
+#### Selector switch sample: Electric radiator
 ![Electric heater](/images/electric_heater_timers.png)
 ![Timers](/images/selectorswitch_electric_heater.png)
 
-Switch samples:
+#### Switch samples:
 ![Switch sample](/images/switch_15mins.png)
 ![Switch Odd/Even](/images/switch_odd_even_week.png)
 
