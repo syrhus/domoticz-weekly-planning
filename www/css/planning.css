@@ -1,4 +1,9 @@
 /************  timesheet **************/
+#deviceTimers .btnstylerev{float:left}
+
+#tabs.ui-widget-content{background-color: transparent}
+#tabs.ui-tabs .ui-tabs-nav li {height:auto}
+
 .ts-planning .ts-wrapper{
 width:100%;
 height:auto;
