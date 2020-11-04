@@ -8,7 +8,7 @@ It can be used for **light/switch(ON/OFF)**, **selector levels** and **SetPoints
 
 
 Setpoint sample:
-![setpoint](/images/setpoint.png)
+![setpoint](/images/setpoint_tabs.png)
 In setpoint configuration, you can define your own temperatures values for the 4th buttons. You just have to click inside the button and enter your value from to greater to the lower
 
 Selector switch sample: Electric radiator
