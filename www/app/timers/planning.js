@@ -18,6 +18,7 @@
 // 2020-07-29 : add 5mins and 2mins Time range
 // 2020-11-04 : add Tabs mode to view either this graphic view or the original data table -  requiered to update/change the /views/timers.html file
 //              available on this repository
+// 2022-11-11 : change mode color for selector swith with the fix (in DeviceTimersController) to get the Off mode if visible
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
@@ -825,7 +826,7 @@ $( document ).on( "timersInitialized", function(event, vm, refreshTimers){
 			 if((vm.isDimmer || vm.isSelector))
 					 $.extend(options, {
 					 "modes": $.map( vm.levelOptions, function(val,i){
-							 return {"value":val.value, "class":"m"+i, "name":val.label };}),
+						return {"value":val.value, "class":"m"+ (val.value == null? i: val.value/10) , "name":val.label };}),
 					 "propValue":"Level",
 					 "propValueAjax":"level"});
 			 else
