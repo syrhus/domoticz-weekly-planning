@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////
 // Weekly Planning ,  2017, Syrhus
-// v1.5
+// v1.4.2
 // updated for v4.9700
 // 2018-09-20 : add  Odd & Even week numbers
 // 2018-10-30 : bug on <th> fixed
@@ -16,9 +16,6 @@
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 // 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
 // 2020-07-29 : add 5mins and 2mins Time range
-// 2020-11-04 : add Tabs mode to view either this graphic view or the original data table -  requiered to update/change the /views/timers.html file
-//              available on this repository
-// 2022-11-11 : change mode color for selector swith with the fix (in DeviceTimersController) to get the Off mode if visible
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
@@ -308,7 +305,6 @@ PlanningTimerSheet = function(options){
 		//check if you have to display odd&even week
 		var isOddEven = false;
 		var nbTicks = 2;
-//		var bReload = false;
 		$.each(SetPoints, function (ndx) {
 			if (this.Type === ONTIME || this.Type === EVEN || this.Type === ODD){
 				if (this.Type === EVEN || this.Type === ODD){
@@ -319,15 +315,10 @@ PlanningTimerSheet = function(options){
 			}
 		});
 
-		/*if(defaults.nbTicksPerHour < nbTicks){
-			defaults.nbTicksPerHour = nbTicks;
-			bReload = true;
-		}*/
 
 		$element.find('#oew_oddeven').attr('checked', isOddEven);
 		if(defaults.odd_even_week !== isOddEven){
 			defaults.odd_even_week =isOddEven;
-			//bReload = true;
 		}
 
 		createPlanning(isOddEven);
@@ -341,11 +332,16 @@ PlanningTimerSheet = function(options){
 
 				var trigger = {};
 				var day = 1;
+						
 
 				trigger.hour = parseInt(this.Time.substr(0, 2));
 				trigger.min = parseInt(this.Time.substr(3, 2));
 				trigger.value = this[defaults.propValue];
 				trigger.active = (this.Active === 'true');
+				
+				if(this.Cmd ===1 && defaults.propValue === "Level" && this.Level === 100)
+					trigger.value=0;
+
 				if( values.indexOf(trigger.value) === -1)
 					values.push(trigger.value);
 
@@ -460,7 +456,10 @@ PlanningTimerSheet = function(options){
 				else if(trigger.min % 5 === 0 )
 					nbTicks = (nbTicks < 12) ? 12 : nbTicks;
 				else if(trigger.min % 2 === 0 )
-					nbTicks = (nbTicks < 30) ? 30 : nbTicks;					
+					nbTicks = (nbTicks < 30) ? 30 : nbTicks;
+					
+				if(nbTicks === 30)
+					return false;					
 			});
 		});
 		
@@ -484,21 +483,28 @@ PlanningTimerSheet = function(options){
 			else if(tsettings.Days === SUM_WEEKENDS)
 				tsettings.Days = WEEKENDS;
 
+
 			var urlcmd =  "json.htm?type=command&param=" + defaults.commandAdd +"&idx=" + defaults.devid +
 				"&active=" + (activeForced ? active : tsettings.Active) +
 				"&timertype=" + tsettings.Type +
 				"&date=" + tsettings.Date +
 				"&hour=" + tsettings.Hour +
 				"&min=" + tsettings.Min +
-				"&" + defaults.propValueAjax +"=" + tsettings[defaults.propValue] +
+
 				"&days=" + tsettings.Days +
 				"&mday=" + tsettings.MDay +
 				"&month=" + tsettings.Month +
 				"&occurence=" + tsettings.Occurence +
 				"&randomness=false";
-
-			if(!defaults.temperatureModes && defaults.propValueAjax !== "command")
-				urlcmd += "&command=0";
+				
+			if(!(defaults.propValue === "Level" && tsettings[defaults.propValue] === 0)) {
+				urlcmd += "&" + defaults.propValueAjax +"=" + tsettings[defaults.propValue];
+				
+				if(!defaults.temperatureModes && defaults.propValueAjax !== "command")
+					urlcmd += "&command=0";
+			}
+			else
+				urlcmd += "&command=1";
 
 			timers.push(urlcmd);
 		});
@@ -684,16 +690,18 @@ PlanningTimerSheet = function(options){
 	initUI = function(){
 		$element = $(defaults.container).find('#ts-planning');
 		if($element.length === 0 )
-  	 		$element = $('<div id="ts-planning" class="ts-planning"></div>').appendTo(defaults.container);
+ 			$element = $('<div id="ts-planning" class="ts-planning"></div>').appendTo(defaults.container);
 		else {
 			 $element.off();
 			 if($tbody)
 			 		$tbody.off();
 			 if($table)
 			 		$table.off();
+			 		
+
 		}
 		
-		$(defaults.container).find('#tabs').tabs() 
+        $(defaults.container).find('#tabs').tabs() 
 
 		if(!(defaults.nbTicksPerHour === 1 || defaults.nbTicksPerHour === 2 || defaults.nbTicksPerHour ===4 || defaults.nbTicksPerHour ===6 || defaults.nbTicksPerHour ===12 || defaults.nbTicksPerHour ===30))
 				defaults.nbTicksPerHour === 2;
@@ -797,7 +805,7 @@ PlanningTimerSheet = function(options){
 	initPlanningTable = function () {
 		createTable();
 			if(defaults.nbTicksPerHour >= 12){
-			   $element.find('.ts-wrapper').addClass((defaults.nbTicksPerHour === 12)?'zoom':'zoom2');
+			   $element.find('.ts-wrapper').removeClass('zoom zoom2').addClass((defaults.nbTicksPerHour === 12)?'zoom':'zoom2');
 
 			}else 
 				$element.find('.ts-wrapper').removeClass('zoom zoom2');
@@ -819,21 +827,27 @@ PlanningTimerSheet = function(options){
 };
 ///////////////////////////////////////////
 
-$( document ).on( "timersInitialized", function(event, vm, refreshTimers){
+$( document ).on( "timersInitialized", function(event, vm,refreshTimers){
 	var options = {"devid":vm.deviceIdx, "refreshCallback":function(){refreshTimers();} };
-	 if( !vm.isSetpointTimers && ((vm.isDimmer || vm.isSelector) || !vm.IsLED)){
-			 $.extend(options, {"commandAdd":"addtimer", "commandClear":"cleartimers","temperatureModes":false} );
-			 if((vm.isDimmer || vm.isSelector))
-					 $.extend(options, {
-					 "modes": $.map( vm.levelOptions, function(val,i){
-						return {"value":val.value, "class":"m"+ (val.value == null? i: val.value/10) , "name":val.label };}),
-					 "propValue":"Level",
-					 "propValueAjax":"level"});
-			 else
-					 $.extend(options, {	"modes": [{"value":0,"name":$.t("On"), "class":"green"},{"value":1,"name":$.t("Off"), "class":"red"}],
+	if( !vm.isSetpointTimers && ((vm.isDimmer || vm.isSelector) || !vm.IsLED)){
+		$.extend(options, {"commandAdd":"addtimer", "commandClear":"cleartimers","temperatureModes":false} );
+		if((vm.isDimmer || vm.isSelector)) {
+
+			var levels = vm.levelOptions;
+			if(!vm.isCommandSelectionDisabled)
+				levels.unshift({"label":"Off","value":0});
+					 
+			$.extend(options, {
+				"modes": $.map( levels, function(val,i){
+					 return {"value":val.value, "class":"m"+ (val.value == null? i: val.value/10) , "name":val.label };}),
+				"propValue":"Level",
+				"propValueAjax":"level"});
+		}
+		else
+			$.extend(options, {	"modes": [{"value":0,"name":$.t("On"), "class":"green"},{"value":1,"name":$.t("Off"), "class":"red"}],
 							 "propValue":"Cmd",
 							 "propValueAjax":"command"});
-	 }
+	}
 
 	PlanningTimerSheet(options);
 });
