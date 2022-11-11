@@ -1,4 +1,5 @@
 /************  timesheet **************/
+
 #deviceTimers .btnstylerev{float:left}
 
 #tabs.ui-widget-content{background-color: transparent}
@@ -91,6 +92,12 @@ overflow-y:hidden;
     vertical-align: baseline;
 }
 
+.ts-planning div.inputmode{
+	float: right;
+	height: 17px;
+	margin-top: 4px;
+}
+
 .ts-planning .modes {
     overflow: auto;
     padding: 5px 0px;
@@ -101,6 +108,11 @@ overflow-y:hidden;
   float:right;
   padding: 5px 0px;
 }
+
+.timeRangediv label{
+margin-right:4px;
+}
+
 
 .ts-planning .mode {
     margin-right: 5px;
@@ -113,5 +125,7 @@ overflow-y:hidden;
 .ts-planning .hover{ background-color: yellow !important; opacity: 0.6}
 
 #oew_oddeven{margin-left:20px;}
+
+
 
 /************************************/
