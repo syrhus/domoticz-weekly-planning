@@ -33,12 +33,6 @@ wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/ww
 
 wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/views/timers.html -O www/views/timers.html
 
-
-NOTE: optional, I created a "empty" html5.appcache file as it is absolutely useless = no Offline mode.
-you can forget it 
-wget https://raw.githubusercontent.com/syrhus/domoticz-weekly-planning/master/www/html5.appcache -O www/html5.appcache
-
-
 /////////////////////////////////////////////////////////////
 
 ## Manual installation:
