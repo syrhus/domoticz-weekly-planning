@@ -69,14 +69,18 @@ overflow-y:hidden;
 }
 
 .ts-planning .m0,
-.green {background-color: #00ff21}
-.ts-planning .m1 {background-color: #0094ff}
-.ts-planning .m2 {background-color: #AAAAAA}
-.ts-planning .m3{ background-color: #00ffff}
-.ts-planning .m4{ background-color: pink}
-.ts-planning .m3{ background-color: white}
-.ts-planning .deactivate{ opacity: 0.3}
 .red{background-color:red;}
+
+.ts-planning .m1,
+.green {background-color: #00ff21}
+
+.ts-planning .m2 {background-color: #0094ff}
+.ts-planning .m3 {background-color: #AAAAAA}
+.ts-planning .m4 {background-color: #00ffff}
+.ts-planning .m5 {background-color: pink}
+.ts-planning .m6 {background-color: white}
+.ts-planning .deactivate{ opacity: 0.3}
+
 
 .ts-planning .inputmode {
     width: 2em;
