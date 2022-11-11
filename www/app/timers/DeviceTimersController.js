@@ -44,17 +44,7 @@ define(['app', 'timers/factories', 'timers/components','timers/planning'], funct
                     : deviceRegularTimersApi;
 
                  if (vm.isSelector) {
-                    //<==== Update For planning -- fix for planning to get Off level if visible  
-                    //vm.levelOptions = device.getSelectorLevelOptions();
-                    vm.levelOptions = device.getLevels()
-                        .slice(device.LevelOffHidden?1:0)
-                        .map(function (levelName, index) {
-                            return {
-                                label: levelName,
-                                value: (index + (device.LevelOffHidden?1:0)) * 10
-                            }
-                        });                    
-                    //<==== Update For planning -- End Fix
+                    vm.levelOptions = device.getSelectorLevelOptions();
                 }
 
                 if (vm.isLED) {
