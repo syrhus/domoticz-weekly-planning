@@ -575,7 +575,7 @@ PlanningTimerSheet = function(options){
 			if(defaults.temperatureModes)
 				_modes.push("<input index=" + index +" type='text' value=" + mode.value +" class='inputmode " + mode.class + "'/><span>°</span>");
 			else
-				_modes.push("<input index=" + index +" type='text' value='  ' class='inputmode " + mode.class + " readonly'/>");
+				_modes.push("<div index=" + index +" class='inputmode " + mode.class + "'></div>");
 
 			_modes.push("</div>");
 		});
