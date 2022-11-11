@@ -28,7 +28,14 @@ define(['app', 'timers/factories', 'timers/components','timers/planning'], funct
                 vm.isSelector = device.isSelector();
                 vm.isLED = device.isLED();
                 vm.isCommandSelectionDisabled = vm.isSelector && device.LevelOffHidden;
+				
+				var type = device.TypeImg.toLowerCase();
+				if ((device.CustomImage !== 0) && (typeof device.Image !== 'undefined')) {
+					type = device.Image.toLowerCase();
+				}
                 vm.isSetpointTimers = (device.Type === 'Thermostat' && device.SubType == 'SetPoint') || (device.Type === 'Radiator 1');
+				vm.isBlind = (type == 'blinds');
+				//vm.isBlind = [3, 13, 14, 15, 21].includes(device.SwitchTypeVal);
 
                 vm.levelOptions = [];
 
@@ -36,7 +43,7 @@ define(['app', 'timers/factories', 'timers/components','timers/planning'], funct
                     ? deviceSetpointTimersApi
                     : deviceRegularTimersApi;
 
-                if (vm.isSelector) {
+                 if (vm.isSelector) {
                     //<==== Update For planning -- fix for planning to get Off level if visible  
                     //vm.levelOptions = device.getSelectorLevelOptions();
                     vm.levelOptions = device.getLevels()
@@ -76,7 +83,7 @@ define(['app', 'timers/factories', 'timers/components','timers/planning'], funct
             vm.selectedTimerIdx = null;
 
             deviceTimers.getTimers(vm.deviceIdx).then(function (items) {
-                 $( document ).trigger( "timersLoaded", [items] );//<===Update for Planning
+                $( document ).trigger( "timersLoaded", [items] );//<===Update for Planning
                 vm.timers = items;
             });
         }
