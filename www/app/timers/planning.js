@@ -16,6 +16,7 @@
 // 2019-11-18 : clear only previous timers id instead of calling the clearTimers function which erase all timers on all timerplan
 // 2019-11-26 : fix deletesetpointtimer instead of deletetimer for thermostat
 // 2020-07-29 : add 5mins and 2mins Time range
+// 2022-11-11 : support Off level for selector switch if not hidden
 ///////////////////////////////////////////////
 
 PlanningTimerSheet = function(options){
