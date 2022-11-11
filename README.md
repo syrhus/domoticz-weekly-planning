@@ -1,6 +1,8 @@
 # domoticz-weekly-planning
 Weekly programming functionality allow to view a graphic table in the Domoticz timers page
 
+Updated for Domoticz 2022.2 version
+
 It can be used for **light/switch(ON/OFF)**, **selector levels** and **SetPoints** 
 - a program can be defined on 2 weeks with the **odd & even weeks mode**
 - the time range can be changed from 1 hour to 2 mins
